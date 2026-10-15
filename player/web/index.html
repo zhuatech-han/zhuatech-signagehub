@@ -1,0 +1,53 @@
+<!doctype html>
+<!-- Copyright 2026 上海如静知华信息科技有限公司 · https://www.zhuatech.cn/ · 微信 zhuatech / zhuatech2 -->
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>SignageHub 播放器设置</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body class="manager">
+    <header>
+      <img class="logo" src="/logo.jpg" alt="知华科技" /><strong
+        >SignageHub</strong
+      ><span>播放器</span><a href="https://www.zhuatech.cn/">知华科技</a>
+    </header>
+    <main>
+      <h1>屏幕连接</h1>
+      <p>首次使用，在内容后台创建屏幕并取得设备令牌。</p>
+      <form id="config">
+        <label
+          >内容后台地址<input
+            name="server"
+            type="url"
+            required
+            placeholder="https://screens.example.com" /></label
+        ><label
+          >设备令牌<input
+            name="token"
+            type="password"
+            autocomplete="off"
+            required
+            maxlength="43" /></label
+        ><button>保存并同步</button>
+      </form>
+      <p id="message" role="status"></p>
+      <section>
+        <h2 id="screen">尚未连接屏幕</h2>
+        <dl id="details"></dl>
+        <div class="actions">
+          <button id="sync" disabled>立即同步</button
+          ><a class="button" href="/display" target="_blank" rel="noopener"
+            >打开播放画面</a
+          >
+        </div>
+      </section>
+      <small
+        >公开源码学习版 · 非商业使用。商业授权或深度定制开发请联系知华科技，微信
+        zhuatech / zhuatech2。</small
+      >
+    </main>
+    <script type="module" src="/manager.js"></script>
+  </body>
+</html>
