@@ -1,0 +1,60 @@
+# Copyright 2026 上海如静知华信息科技有限公司 · https://www.zhuatech.cn/ · 微信 zhuatech / zhuatech2
+name: Verify SignageHub
+on: [push, pull_request, workflow_dispatch]
+permissions: {contents: read}
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with: {distribution: temurin, java-version: '21', cache: maven, cache-dependency-path: backend/pom.xml}
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with: {node-version: '24.19.0', cache: npm, cache-dependency-path: 'frontend/package-lock.json'}
+      - name: Backend format, unit, HTTP and concurrency tests
+        run: mvn -B -f backend/pom.xml spotless:check verify
+      - name: Frontend format, lint, tests and build
+        working-directory: frontend
+        run: |
+          npm ci --no-audit --no-fund
+          npm run format:check
+          npm run lint
+          npm test
+          npm run build
+      - name: Player cache, local HTTP, restart and supervisor checks
+        working-directory: player
+        run: |
+          npm ci --no-audit --no-fund
+          npm run format:check
+          npm run lint
+          npm test
+      - name: Fresh MySQL and media-volume deployment
+        run: |
+          python3 scripts/init-env.py
+          python3 -m compileall -q scripts
+          docker compose -p signagehub-ci config --quiet
+          docker compose -p signagehub-ci up -d --build --wait --wait-timeout 1800
+          python3 scripts/readiness.py
+      - name: Real media, publication, schedule and permissions
+        run: |
+          curl --fail http://127.0.0.1:8170/actuator/health
+          python3 scripts/quality.py --project signagehub-ci --video
+          docker compose -p signagehub-ci restart backend
+          docker compose -p signagehub-ci up -d --wait --wait-timeout 1800
+          python3 scripts/verify-persistence.py
+      - name: SQL and media backup with empty-volume restore
+        run: |
+          python3 scripts/backup.py --project signagehub-ci --output /tmp/signagehub-ci.zip
+          python3 scripts/readiness.py
+          python3 scripts/restore-env.py --source .env --output /tmp/signagehub-restore.env --port 8172
+          python3 scripts/restore.py /tmp/signagehub-ci.zip --project signagehub-ci-restore --env-file /tmp/signagehub-restore.env
+          python3 scripts/verify-persistence.py --base http://127.0.0.1:8172
+      - name: Release assets, documentation, secrets and Git checks
+        run: python3 scripts/release-check.py
+      - name: Cleanup this run only
+        if: always()
+        run: |
+          if [ -f .env ]; then docker compose -p signagehub-ci down -v; fi
+          if [ -f /tmp/signagehub-restore.env ]; then docker compose --env-file /tmp/signagehub-restore.env -p signagehub-ci-restore down -v; fi
+          rm -f /tmp/signagehub-ci.zip /tmp/signagehub-restore.env
