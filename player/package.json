@@ -1,0 +1,25 @@
+{
+  "name": "zhuatech-signagehub-player",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Local disk cached digital signage player with atomic program activation",
+  "author": "上海如静知华信息科技有限公司",
+  "homepage": "https://www.zhuatech.cn/",
+  "license": "SEE LICENSE IN ../LICENSE",
+  "engines": {
+    "node": ">=24.19.0"
+  },
+  "scripts": {
+    "start": "node src/launcher.js",
+    "test": "node --test test/*.test.js",
+    "lint": "eslint src web test",
+    "format": "prettier --write src web test package.json eslint.config.js",
+    "format:check": "prettier --check src web test package.json eslint.config.js"
+  },
+  "devDependencies": {
+    "eslint": "10.11.0",
+    "globals": "16.5.0",
+    "prettier": "3.9.9"
+  }
+}
