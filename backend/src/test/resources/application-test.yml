@@ -1,0 +1,11 @@
+# Copyright 2026 上海如静知华信息科技有限公司 · https://www.zhuatech.cn/ · 微信 zhuatech / zhuatech2
+spring:
+  datasource:
+    url: ${TEST_DATABASE_URL:jdbc:h2:mem:signage;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1;LOCK_TIMEOUT=30000}
+    username: ${TEST_DATABASE_USER:sa}
+    password: ${TEST_DATABASE_PASSWORD:}
+  jpa.properties.hibernate.dialect: ${TEST_DIALECT:org.hibernate.dialect.H2Dialect}
+signagehub:
+  admin-username: admin
+  admin-password: TestOnlyAdmin9Strong
+  media-dir: ${TEST_MEDIA_DIR:/tmp/signagehub-unit-media}
