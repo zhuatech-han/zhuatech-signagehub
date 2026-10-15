@@ -1,0 +1,11 @@
+.env
+.env.*
+!.env.example
+node_modules/
+target/
+dist/
+output/
+player-data/
+*.log
+__pycache__/
+.DS_Store
